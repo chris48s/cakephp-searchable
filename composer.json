@@ -1,0 +1,34 @@
+{
+    "name": "chris48s/cakephp-searchable",
+    "description": "A CakePHP 3 Behavior for creating MySQL MATCH() AGAINST() queries",
+    "type": "cakephp-plugin",
+    "keywords": ["cakephp", "searchable", "search", "fulltext", "mysql"],
+    "homepage": "https://github.com/chris48s/cakephp-searchable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "chris48s",
+            "email": "c.mshaw@yahoo.co.uk"
+        }
+    ],
+    "require": {
+        "cakephp/cakephp": "~3.0",
+        "php": ">=5.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.1.*",
+        "cakephp/cakephp-codesniffer": "dev-master",
+        "satooshi/php-coveralls": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Chris48s\\Searchable\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Chris48s\\Searchable\\Test\\": "tests",
+            "Chris48s\\Searchable\\Test\\Fixture\\": "tests/Fixture"
+        }
+    }
+}
