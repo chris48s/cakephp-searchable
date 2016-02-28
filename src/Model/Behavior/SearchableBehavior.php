@@ -2,6 +2,7 @@
 
 namespace Chris48s\Searchable\Model\Behavior;
 
+use Cake\Database\Driver\Mysql;
 use Cake\ORM\Behavior;
 use Cake\ORM\Query;
 use Chris48s\Searchable\Exception\SearchableException;
