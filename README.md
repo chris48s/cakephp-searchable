@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/chris48s/cakephp-searchable.svg?branch=master)](https://travis-ci.org/chris48s/cakephp-searchable)
+[![Coverage Status](https://coveralls.io/repos/github/chris48s/cakephp-searchable/badge.svg?branch=master)](https://coveralls.io/github/chris48s/cakephp-searchable?branch=master)
+
 # CakePHP Searchable Behavior Plugin
 
 A CakePHP 3 Behavior for creating MySQL [MATCH() AGAINST() queries](https://dev.mysql.com/doc/refman/5.6/en/fulltext-search.html).
