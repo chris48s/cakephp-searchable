@@ -1,0 +1,163 @@
+<?php
+
+namespace Chris48s\Searchable\Test\TestCase\Model\Behavior;
+
+use Cake\Datasource\ConnectionManager;
+use Cake\ORM\TableRegistry;
+use Cake\TestSuite\TestCase;
+use Chris48s\Searchable\Exception\SearchableException;
+use Chris48s\Searchable\Exception\SearchableFatalException;
+use Chris48s\Searchable\Model\Behavior\SearchableBehavior;
+
+class SearchableBehaviorTest extends TestCase
+{
+    public $fixtures = [
+        'plugin.Chris48s\Searchable.foo'
+    ];
+
+    public function tearDown()
+    {
+        parent::tearDown();
+        TableRegistry::clear();
+    }
+
+    // set up a table to use for testing
+    private function getTable()
+    {
+        $table = TableRegistry::get('Foo');
+        $table->addBehavior('Chris48s/Searchable.Searchable');
+        return $table;
+    }
+
+    /* pass in column which is not of type string or text
+       and ensure SearchableException is thrown */
+    public function testNonStringColumn()
+    {
+        $this->setExpectedException('Chris48s\Searchable\Exception\SearchableException');
+        $table = $this->getTable();
+        $table->find('matches', [
+            [
+                'match' => 'id',
+                'against' => 'foo'
+            ]
+        ]);
+    }
+
+    /* pass in column that doesn't exist
+       and ensure SearchableException is thrown */
+    public function testInvalidColumn()
+    {
+        $this->setExpectedException('Chris48s\Searchable\Exception\SearchableException');
+        $table = $this->getTable();
+        $table->find('matches', [
+            [
+                'match' => 'foo',
+                'against' => 'foo'
+            ]
+        ]);
+    }
+
+    /* pass in a mode that is not in the whitelist and ensure
+       no mode argument is added to the MATCH() AGAINST() clause */
+    public function testInvalidMode()
+    {
+        $table = $this->getTable();
+        $query = $table->find('matches', [
+            [
+                'match' => 'textcol1',
+                'against' => 'foo',
+                'mode' => 'foo'
+            ]
+        ]);
+        $expectedSql = "WHERE MATCH(textcol1) AGAINST (:match0 )";
+        $this->assertEquals($expectedSql, substr($query->sql(), -40));
+    }
+
+    // omit 'match' key and ensure SearchableException is thrown
+    public function testMissingMatchKey()
+    {
+        $this->setExpectedException('Chris48s\Searchable\Exception\SearchableException');
+        $table = $this->getTable();
+        $table->find('matches', [
+            [
+                'against' => 'foo',
+            ]
+        ]);
+    }
+
+    // omit 'against' key and ensure SearchableException is thrown
+    public function testMissingAgainstKey()
+    {
+        $this->setExpectedException('Chris48s\Searchable\Exception\SearchableException');
+        $table = $this->getTable();
+        $table->find('matches', [
+            [
+                'match' => 'textcol1'
+            ]
+        ]);
+    }
+
+    /* Only MySQL is supported
+       Pass in a connection to another DB engine
+       and ensure correct exception is thrown */
+    public function testInvalidDB()
+    {
+        $this->setExpectedException('Chris48s\Searchable\Exception\SearchableFatalException');
+
+        //set up a SQLite DB connection - SQLite is not supported
+        ConnectionManager::config('invalid', [
+            'url' => 'sqlite:///:memory:',
+            'timezone' => 'UTC'
+        ]);
+        $conn = ConnectionManager::get('invalid');
+
+        //create a table in SQLite
+        $conn->query("CREATE TABLE `Foo` (
+            `id` int(11) NOT NULL,
+            `textcol` VARCHAR(255),
+            PRIMARY KEY (`id`)
+        );");
+        $table = TableRegistry::get('Foo', ['connection' => $conn]);
+        $table->addBehavior('Chris48s/Searchable.Searchable');
+
+        //tidy up
+        ConnectionManager::dropAlias('invalid');
+    }
+
+    // pass some valid options and ensure the expected query is returned
+    public function testSimpleValidQuery()
+    {
+        $table = $this->getTable();
+        $query = $table->find('matches', [
+            [
+                'match' => 'textcol1',
+                'against' => 'foo'
+            ]
+        ]);
+        $expectedSql = "WHERE MATCH(textcol1) AGAINST (:match0 )";
+        $this->assertEquals($expectedSql, substr($query->sql(), -40));
+    }
+
+    /* pass some slightly more diverse valid options
+       and ensure the expected query is returned */
+    public function testValidQueryMultipleMatchClauses()
+    {
+        $table = $this->getTable();
+        $options = [
+            [
+                'match' => 'textcol1',
+                'against' => 'foo',
+                'mode' => 'IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION' //valid mode
+            ],
+            [
+                'match' => '    textcol2,  textcol3', //multiple columns and some extraneous whitespace
+                'against' => 'foo',
+                'mode' => 'IN BOOLEAN MODE' //another valid mode
+            ]
+        ];
+        $query = $table->find('matches', $options);
+        $expectedSql = "WHERE (MATCH(textcol1) AGAINST (:match0 {$options[0]['mode']} ) AND " .
+                       "MATCH({$options[1]['match']}) AGAINST (:match1 {$options[1]['mode']} ))";
+        $this->assertEquals($expectedSql, substr($query->sql(), -158));
+    }
+}
