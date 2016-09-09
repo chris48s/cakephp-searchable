@@ -160,4 +160,27 @@ class SearchableBehaviorTest extends TestCase
                        "MATCH({$options[1]['match']}) AGAINST (:match1 {$options[1]['mode']} ))";
         $this->assertEquals($expectedSql, substr($query->sql(), -158));
     }
+
+    /* pass multiple match clauses with string keys
+       and ensure the expected query is returned */
+    public function testValidQueryMultipleMatchClausesStringKeys()
+    {
+        $table = $this->getTable();
+        $options = [
+            'abc' => [
+                'match' => 'textcol1',
+                'against' => 'foo',
+                'mode' => 'IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION' //valid mode
+            ],
+            'def' => [
+                'match' => '    textcol2,  textcol3', //multiple columns and some extraneous whitespace
+                'against' => 'foo',
+                'mode' => 'IN BOOLEAN MODE' //another valid mode
+            ]
+        ];
+        $query = $table->find('matches', $options);
+        $expectedSql = "WHERE (MATCH(textcol1) AGAINST (:match0 {$options['abc']['mode']} ) AND " .
+                       "MATCH({$options['def']['match']}) AGAINST (:match1 {$options['def']['mode']} ))";
+        $this->assertEquals($expectedSql, substr($query->sql(), -158));
+    }
 }

@@ -60,6 +60,7 @@ class SearchableBehavior extends Behavior
     public function findMatches(Query $query, array $options)
     {
         $conditions = [];
+        $options = array_values($options);
 
         //assemble MATCH() AGAINST() clauses
         foreach ($options as $key => $option) {
