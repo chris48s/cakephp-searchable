@@ -64,7 +64,6 @@ class SearchableBehavior extends Behavior
 
         //assemble MATCH() AGAINST() clauses
         foreach ($options as $key => $option) {
-
             if (!isset($option['match']) || !isset($option['against'])) {
                 throw new SearchableException("Keys 'match' and 'against' must be set");
             }
@@ -106,6 +105,7 @@ class SearchableBehavior extends Behavior
                 throw new SearchableException('Invalid column');
             }
         }
+
         return true;
     }
 }

@@ -26,6 +26,7 @@ class SearchableBehaviorTest extends TestCase
     {
         $table = TableRegistry::get('Foo');
         $table->addBehavior('Chris48s/Searchable.Searchable');
+
         return $table;
     }
 
