@@ -43,6 +43,7 @@ class SearchableBehavior extends Behavior
             $columnInfo = $collection->describe($this->_table->table())->column($column);
             if (($columnInfo['type'] == 'string') || ($columnInfo['type'] == 'text')) {
                 $this->_columnsWhitelist[] = $column;
+                $this->_columnsWhitelist[] = $this->_table->alias()+'.'+$column;
             }
         }
     }
