@@ -139,6 +139,19 @@ class SearchableBehaviorTest extends TestCase
         $this->assertEquals($expectedSql, substr($query->sql(), -40));
     }
 
+    // pass some valid options and explicitly specify table name in query
+    public function testSimpleValidQueryWithTableName()
+    {
+        $table = $this->getTable();
+        $query = $table->find('matches', [
+            [
+                'match' => 'Foo.textcol1',
+                'against' => 'Now this is a story'
+            ]
+        ]);
+        $this->assertEquals(1, count($query->toArray()));
+    }
+
     /* pass some slightly more diverse valid options
        and ensure the expected query is returned */
     public function testValidQueryMultipleMatchClauses()
