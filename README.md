@@ -14,7 +14,7 @@ Add the following to your `composer.json`:
 
 ```
 "require": {
-    "chris48s/cakephp-searchable": "^1.0.0"
+    "chris48s/cakephp-searchable": "^2.0.0"
 }
 ```
 
