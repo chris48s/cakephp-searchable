@@ -106,7 +106,7 @@ class SearchableBehaviorTest extends TestCase
         $this->setExpectedException('Chris48s\Searchable\Exception\SearchableFatalException');
 
         //set up a SQLite DB connection - SQLite is not supported
-        ConnectionManager::config('invalid', [
+        ConnectionManager::setConfig('invalid', [
             'url' => 'sqlite:///:memory:',
             'timezone' => 'UTC'
         ]);

@@ -29,21 +29,21 @@ class SearchableBehavior extends Behavior
      */
     public function initialize(array $config)
     {
-        $connection = $this->_table->connection();
+        $connection = $this->_table->getConnection();
 
         //ensure database engine is MySQL
-        if (!$connection->driver() instanceof Mysql) {
+        if (!$connection->getDriver() instanceof Mysql) {
             throw new SearchableFatalException('Only MySQL is supported');
         }
 
         //build a whitelist of string/text columns
-        $collection = $connection->schemaCollection();
-        $columns = $collection->describe($this->_table->table())->columns();
+        $collection = $connection->getSchemaCollection();
+        $columns = $collection->describe($this->_table->getTable())->columns();
         foreach ($columns as $column) {
-            $columnInfo = $collection->describe($this->_table->table())->column($column);
+            $columnInfo = $collection->describe($this->_table->getTable())->getColumn($column);
             if (($columnInfo['type'] == 'string') || ($columnInfo['type'] == 'text')) {
                 $this->_columnsWhitelist[] = $column;
-                $this->_columnsWhitelist[] = $this->_table->alias() . '.' . $column;
+                $this->_columnsWhitelist[] = $this->_table->getAlias() . '.' . $column;
             }
         }
     }
