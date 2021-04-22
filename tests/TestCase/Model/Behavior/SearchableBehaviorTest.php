@@ -3,28 +3,26 @@
 namespace Chris48s\Searchable\Test\TestCase\Model\Behavior;
 
 use Cake\Datasource\ConnectionManager;
-use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Chris48s\Searchable\Exception\SearchableException;
 use Chris48s\Searchable\Exception\SearchableFatalException;
-use Chris48s\Searchable\Model\Behavior\SearchableBehavior;
 
 class SearchableBehaviorTest extends TestCase
 {
     public $fixtures = [
-        'plugin.Chris48s\Searchable.foo'
+        'plugin.Chris48s\Searchable.Foo'
     ];
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
-        TableRegistry::clear();
+        $this->getTableLocator()->clear();
     }
 
     // set up a table to use for testing
     private function getTable()
     {
-        $table = TableRegistry::get('Foo');
+        $table = $this->getTableLocator()->get('Foo');
         $table->addBehavior('Chris48s/Searchable.Searchable');
 
         return $table;
@@ -34,7 +32,7 @@ class SearchableBehaviorTest extends TestCase
        and ensure SearchableException is thrown */
     public function testNonStringColumn()
     {
-        $this->setExpectedException('Chris48s\Searchable\Exception\SearchableException');
+        $this->expectException(SearchableException::class);
         $table = $this->getTable();
         $table->find('matches', [
             [
@@ -48,7 +46,7 @@ class SearchableBehaviorTest extends TestCase
        and ensure SearchableException is thrown */
     public function testInvalidColumn()
     {
-        $this->setExpectedException('Chris48s\Searchable\Exception\SearchableException');
+        $this->expectException(SearchableException::class);
         $table = $this->getTable();
         $table->find('matches', [
             [
@@ -77,7 +75,7 @@ class SearchableBehaviorTest extends TestCase
     // omit 'match' key and ensure SearchableException is thrown
     public function testMissingMatchKey()
     {
-        $this->setExpectedException('Chris48s\Searchable\Exception\SearchableException');
+        $this->expectException(SearchableException::class);
         $table = $this->getTable();
         $table->find('matches', [
             [
@@ -89,7 +87,7 @@ class SearchableBehaviorTest extends TestCase
     // omit 'against' key and ensure SearchableException is thrown
     public function testMissingAgainstKey()
     {
-        $this->setExpectedException('Chris48s\Searchable\Exception\SearchableException');
+        $this->expectException(SearchableException::class);
         $table = $this->getTable();
         $table->find('matches', [
             [
@@ -103,7 +101,7 @@ class SearchableBehaviorTest extends TestCase
        and ensure correct exception is thrown */
     public function testInvalidDB()
     {
-        $this->setExpectedException('Chris48s\Searchable\Exception\SearchableFatalException');
+        $this->expectException(SearchableFatalException::class);
 
         //set up a SQLite DB connection - SQLite is not supported
         ConnectionManager::setConfig('invalid', [
@@ -118,7 +116,7 @@ class SearchableBehaviorTest extends TestCase
             `textcol` VARCHAR(255),
             PRIMARY KEY (`id`)
         );");
-        $table = TableRegistry::get('Foo', ['connection' => $conn]);
+        $table = $this->getTableLocator()->get('Foo', ['connection' => $conn]);
         $table->addBehavior('Chris48s/Searchable.Searchable');
 
         //tidy up
