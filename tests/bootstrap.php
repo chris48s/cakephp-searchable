@@ -1,4 +1,11 @@
 <?php
+
+use Cake\Cache\Cache;
+use Cake\Core\BasePlugin;
+use Cake\Core\Configure;
+use Cake\Core\Plugin;
+use Cake\Datasource\ConnectionManager;
+use Cake\Filesystem\Folder;
 // @codingStandardsIgnoreFile
 
 $findRoot = function () {
@@ -38,10 +45,10 @@ define('CAKE', CORE_PATH . 'src' . DS);
 require ROOT . '/vendor/autoload.php';
 require CORE_PATH . 'config/bootstrap.php';
 
-Cake\Core\Configure::write('App', ['namespace' => 'App']);
-Cake\Core\Configure::write('debug', true);
+Configure::write('App', ['namespace' => 'App']);
+Configure::write('debug', true);
 
-$TMP = new \Cake\Filesystem\Folder(TMP);
+$TMP = new Folder(TMP);
 $TMP->create(TMP . 'cache/models', 0777);
 $TMP->create(TMP . 'cache/persistent', 0777);
 $TMP->create(TMP . 'cache/views', 0777);
@@ -66,19 +73,19 @@ $cache = [
     ]
 ];
 
-Cake\Cache\Cache::setConfig($cache);
-Cake\Core\Configure::write('Session', [
+Cache::setConfig($cache);
+Configure::write('Session', [
     'defaults' => 'php'
 ]);
 
-Cake\Core\Plugin::load('Chris48s/Searchable', ['path' => ROOT . DS, 'autoload' => true]);
+Plugin::getCollection()->add(new BasePlugin(['name' => 'Chris48s/Searchable', 'path' => ROOT . DS, 'autoload' => true]));
 
 // Ensure default test connection is defined
 if (!getenv('db_dsn')) {
     putenv('db_dsn=sqlite:///:memory:');
 }
 
-Cake\Datasource\ConnectionManager::setConfig('test', [
+ConnectionManager::setConfig('test', [
     'url' => getenv('db_dsn'),
     'timezone' => 'UTC'
 ]);
