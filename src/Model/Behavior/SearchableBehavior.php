@@ -27,7 +27,7 @@ class SearchableBehavior extends Behavior
      * @throws SearchableFatalException If database engine is not MySQL
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config): void
     {
         $connection = $this->_table->getConnection();
 
@@ -58,7 +58,7 @@ class SearchableBehavior extends Behavior
      * @throws SearchableException If columns are invalid
      * @return \Cake\ORM\Query
      */
-    public function findMatches(Query $query, array $options)
+    public function findMatches(Query $query, array $options): Query
     {
         $conditions = [];
         $options = array_values($options);
@@ -98,7 +98,7 @@ class SearchableBehavior extends Behavior
      * @throws SearchableException If columns are invalid
      * @return bool
      */
-    private function _validateColumns($columnList)
+    private function _validateColumns(string $columnList): bool
     {
         $columns = explode(',', $columnList);
         foreach ($columns as $column) {
