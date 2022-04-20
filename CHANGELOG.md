@@ -1,5 +1,10 @@
 # Changelog
 
+## :package: [3.0.0](https://packagist.org/packages/chris48s/cakephp-searchable#3.0.0) - TODO
+
+* Adds compatibility with CakePHP 4, drops compatibility with CakePHP 3
+* New maintainer: @robertpustulka
+
 ## :package: [2.0.0](https://packagist.org/packages/chris48s/cakephp-searchable#2.0.0) - 2018-05-10
 
 * Remove deprecated CakePHP calls
